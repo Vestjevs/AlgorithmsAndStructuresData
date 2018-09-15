@@ -23,7 +23,7 @@ public class UF {
         if (pID == qID) return;
 
         for (int i = 0; i < id.length; i++) {
-            if (id[i] == pID) id[i] = qID;
+            if (id[i] == qID) id[i] = pID;
             count--;
         }
 
@@ -42,7 +42,7 @@ public class UF {
     }
 
     public static void main(String[] args) {
-        int N = Integer.parseInt("625");
+        int N = Integer.parseInt("1000000");
         UF uf = new UF(N);
         while (!StdIn.isEmpty()) {
             int p = StdIn.readInt();
