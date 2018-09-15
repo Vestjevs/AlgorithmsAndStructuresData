@@ -42,7 +42,7 @@ public class UF {
     }
 
     public static void main(String[] args) {
-        int N = Integer.parseInt("625");
+        int N = Integer.parseInt("10");
         UF uf = new UF(N);
         while (!StdIn.isEmpty()) {
             int p = StdIn.readInt();
