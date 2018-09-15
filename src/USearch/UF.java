@@ -1,31 +1,42 @@
 package USearch;
 
 
-import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdOut;
+import java.io.*;
+import java.util.Scanner;
 
 public class UF {
-    private int[] id; // access to the component identifier
+    private int[] id; // parent link
+    private int[] sz; // size of component for root
     private int count;
 
     UF(int N) {
         count = N;
         id = new int[N];
+        sz = new int[N];
         for (int i = 0; i < N; i++) {
             id[i] = i;
+            sz[i] = 1;
         }
     }
 
     public void union(int p, int q) {
-        int pRoot = find(p);
-        int qRoot = find(q);
+        int i = find(p);
+        int j = find(q);
 
-        if (pRoot == qRoot) return;
-        id[pRoot] = qRoot;
+        if (i == j) return;
+        //меньший корень должен указывать на большой
+        if (sz[i] < sz[j]) {
+            id[i] = j;
+            sz[j] += sz[i];
+        } else {
+            id[j] = i;
+            sz[i] += sz[j];
+        }
+
         count--;
     }
 
-    public int find(int p) {
+    private int find(int p) {
         while (p != id[p]) p = id[p];
         return p;
     }
@@ -41,15 +52,26 @@ public class UF {
     public static void main(String[] args) {
         int N = Integer.parseInt("1000000");
         UF uf = new UF(N);
-        while (!StdIn.isEmpty()) {
-            int p = StdIn.readInt();
-            int q = StdIn.readInt();
 
-            if (uf.connected(p, q)) continue;
-            uf.union(p, q);
-            StdOut.println(p + " " + q);
+        try {
+            Scanner in = new Scanner(new File("file.txt"));
+            BufferedWriter out = new BufferedWriter(new FileWriter("out.txt"));
+
+            while (in.hasNextInt()) {
+                int p = in.nextInt();
+                int q = in.nextInt();
+
+                if (uf.connected(p, q)) continue;
+                uf.union(p, q);
+                out.write(p + " " + q);
+                out.newLine();
+            }
+            out.write(uf.count() + " components");
+            out.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        StdOut.println(uf.count + " components");
 
     }
 
