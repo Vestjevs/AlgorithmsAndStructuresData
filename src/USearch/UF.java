@@ -17,20 +17,17 @@ public class UF {
     }
 
     public void union(int p, int q) {
-        int pID = find(p);
-        int qID = find(q);
+        int pRoot = find(p);
+        int qRoot = find(q);
 
-        if (pID == qID) return;
-
-        for (int i = 0; i < id.length; i++) {
-            if (id[i] == qID) id[i] = pID;
-            count--;
-        }
-
+        if (pRoot == qRoot) return;
+        id[pRoot] = qRoot;
+        count--;
     }
 
     public int find(int p) {
-        return id[p];
+        while (p != id[p]) p = id[p];
+        return p;
     }
 
     public boolean connected(int p, int q) {
