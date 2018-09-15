@@ -23,7 +23,7 @@ public class LocalMinimum {
         int j = a.length / 2;
 
 
-        // TODO: 04.09.18  
+
         while ((i != 0 || j != a.length - 1) || (i != a.length || j != 0)) {
             if (a[i][j] < a[i][j + 1] && a[i][j] < a[i][j - 1] && a[i][j] < a[i - 1][j] && a[i][j] < a[i + 1][j]) {
                 return a[i][j];
