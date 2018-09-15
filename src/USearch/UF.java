@@ -1,6 +1,8 @@
 package USearch;
 
 
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 public class UF {
     private int[] id; // access to the component identifier
@@ -37,6 +39,21 @@ public class UF {
 
     public int count() {
         return count;
+    }
+
+    public static void main(String[] args) {
+        int N = Integer.parseInt("625");
+        UF uf = new UF(N);
+        while (!StdIn.isEmpty()) {
+            int p = StdIn.readInt();
+            int q = StdIn.readInt();
+
+            if (uf.connected(p, q)) continue;
+            uf.union(p, q);
+            StdOut.println(p + " " + q);
+        }
+        StdOut.println(uf.count + " components");
+
     }
 
 }
