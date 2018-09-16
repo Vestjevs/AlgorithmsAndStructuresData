@@ -1,13 +1,18 @@
 package USearch;
 
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class UF {
     private int[] id; // parent link
     private int[] sz; // size of component for root
     private int count;
+    private int total;
+    private int cost;
 
     UF(int N) {
         count = N;
@@ -17,6 +22,8 @@ public class UF {
             id[i] = i;
             sz[i] = 1;
         }
+        cost = N;
+        total = 2 * N;
     }
 
     public void union(int p, int q) {
@@ -28,16 +35,26 @@ public class UF {
         if (sz[i] < sz[j]) {
             id[i] = j;
             sz[j] += sz[i];
+            cost += 2;
+            total += 3;
         } else {
             id[j] = i;
             sz[i] += sz[j];
+            cost += 2;
+            total += 3;
         }
+        cost += 2;
+        total += 2;
 
         count--;
     }
 
     private int find(int p) {
-        while (p != id[p]) p = id[p];
+        while (p != id[p]) {
+            p = id[p];
+            total += 2;
+        }
+        total++;
         return p;
     }
 
@@ -49,9 +66,18 @@ public class UF {
         return count;
     }
 
+    public int getTotal() {
+        return total;
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
     public static void main(String[] args) {
-        int N = Integer.parseInt("1000000");
+        int N = Integer.parseInt("625");
         UF uf = new UF(N);
+
 
         try {
             Scanner in = new Scanner(new File("file.txt"));
@@ -69,10 +95,17 @@ public class UF {
             out.write(uf.count() + " components");
             out.flush();
 
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+//        for (int i = 1; i <= N; i++) {
+//            StdDraw.point(i / 100, uf.getCost() / 100);
+//            StdDraw.show();
+//            StdDraw.point(i / 100, uf.getTotal() / (i * 100));
+//            StdDraw.show();
+//        }
 
     }
-
 }
