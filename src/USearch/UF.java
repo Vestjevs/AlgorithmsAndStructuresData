@@ -50,12 +50,19 @@ public class UF {
     }
 
     private int find(int p) {
+        validate(p);
         while (p != id[p]) {
             p = id[p];
             total += 2;
         }
         total++;
         return p;
+    }
+
+    private void validate(int p) {
+        int size = id.length;
+        if (p < 0 || p >= size)
+            throw new IllegalArgumentException("index " + p + " is not between 0 and " + (size - 1));
     }
 
     public boolean connected(int p, int q) {
@@ -94,7 +101,6 @@ public class UF {
             }
             out.write(uf.count() + " components");
             out.flush();
-
 
 
         } catch (IOException e) {
