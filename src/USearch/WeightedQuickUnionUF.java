@@ -7,14 +7,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class UF {
+public class WeightedQuickUnionUF {
     private int[] id; // parent link
     private int[] sz; // size of component for root
     private int count;
     private int total;
     private int cost;
 
-    UF(int N) {
+    WeightedQuickUnionUF(int N) {
         count = N;
         id = new int[N];
         sz = new int[N];
@@ -83,7 +83,7 @@ public class UF {
 
     public static void main(String[] args) {
         int N = Integer.parseInt("625");
-        UF uf = new UF(N);
+        WeightedQuickUnionUF uf = new WeightedQuickUnionUF(N);
 
 
         try {
