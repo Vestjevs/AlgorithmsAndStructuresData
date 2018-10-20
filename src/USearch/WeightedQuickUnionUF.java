@@ -1,11 +1,7 @@
 package USearch;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
+import java.util.Arrays;
 
 public class WeightedQuickUnionUF {
     private int[] id; // parent link
@@ -51,12 +47,18 @@ public class WeightedQuickUnionUF {
 
     private int find(int p) {
         validate(p);
-        while (p != id[p]) {
-            p = id[p];
+        int root = p;
+        while (root != id[root]) {
+            root = id[root];
             total += 2;
         }
+        while (p != root) {
+            int newp = id[p];
+            id[p] = root;
+            root = newp;
+        }
         total++;
-        return p;
+        return root;
     }
 
     private void validate(int p) {
@@ -81,37 +83,49 @@ public class WeightedQuickUnionUF {
         return cost;
     }
 
+    public int[] getId() {
+        return id;
+    }
+
+    public int[] getSz() {
+        return sz;
+    }
+
     public static void main(String[] args) {
-        int N = Integer.parseInt("625");
-        WeightedQuickUnionUF uf = new WeightedQuickUnionUF(N);
-
-
-        try {
-            Scanner in = new Scanner(new File("file.txt"));
-            BufferedWriter out = new BufferedWriter(new FileWriter("out.txt"));
-
-            while (in.hasNextInt()) {
-                int p = in.nextInt();
-                int q = in.nextInt();
-
-                if (uf.connected(p, q)) continue;
-                uf.union(p, q);
-                out.write(p + " " + q);
-                out.newLine();
-            }
-            out.write(uf.count() + " components");
-            out.flush();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-//        for (int i = 1; i <= N; i++) {
-//            StdDraw.point(i / 100, uf.getCost() / 100);
-//            StdDraw.show();
-//            StdDraw.point(i / 100, uf.getTotal() / (i * 100));
-//            StdDraw.show();
+//        int N = Integer.parseInt("625");
+//        WeightedQuickUnionUF uf = new WeightedQuickUnionUF(N);
+//
+//
+//        try {
+//            Scanner in = new Scanner(new File("file.txt"));
+//            BufferedWriter out = new BufferedWriter(new FileWriter("out.txt"));
+//
+//            while (in.hasNextInt()) {
+//                int p = in.nextInt();
+//                int q = in.nextInt();
+//
+//                if (uf.connected(p, q)) continue;
+//                uf.union(p, q);
+//                out.write(p + " " + q);
+//                out.newLine();
+//            }
+//            out.write(uf.count() + " components");
+//            out.flush();
+//
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
 //        }
+        WeightedQuickUnionUF uf = new WeightedQuickUnionUF(8);
 
+        uf.union(0, 1);
+        uf.union(2, 3);
+        uf.union(4, 5);
+        uf.union(6, 7);
+        uf.union(0, 2);
+        uf.union(4, 6);
+        uf.union(0, 4);
+        System.out.println(Arrays.toString(uf.id));
+        System.out.println(Arrays.toString(uf.sz));
     }
 }

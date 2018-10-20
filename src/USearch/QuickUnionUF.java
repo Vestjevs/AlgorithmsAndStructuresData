@@ -19,10 +19,16 @@ public class QuickUnionUF {
 
     public int find(int p) {
         validate(p);
-        while (p != parent[p]) {
-            p = parent[p];
+        int root = p;
+        while (root != parent[root]) {
+            root = parent[root];
         }
-        return p;
+        while( p != root){
+            int newp = parent[p];
+            parent[p] = root;
+            p = newp;
+        }
+        return root;
     }
 
     public boolean connected(int p, int q) {

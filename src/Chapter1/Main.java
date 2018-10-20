@@ -3,7 +3,6 @@ package Chapter1;
 
 import edu.princeton.cs.algs4.Date;
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.StdRandom;
 
 public class Main {
 
@@ -138,6 +137,21 @@ public class Main {
             transactions[i] = new TransactionImpl(queue.dequeue());
         }
         return transactions;
+    }
+
+    public static String toJadenSmith(String phrase) {
+        String str;
+        if (phrase == null || phrase.length() == 0) {
+            return null;
+        } else str = phrase.toUpperCase().substring(0, 1);
+
+
+        for (int i = 1; i < phrase.length(); i++) {
+            if (phrase.charAt(i - 1) == ' ') {
+                str += Character.toUpperCase(phrase.charAt(i));
+            } else str += phrase.charAt(i);
+        }
+        return str;
     }
 
 
@@ -308,10 +322,12 @@ public class Main {
 //
 //        }
 
-        int N = Integer.parseInt("100");
-        for (int i = 0; i < N; i++) {
-            System.out.printf("%4d", StdRandom.uniform(0, N - 1));
-        }
+//        int N = Integer.parseInt("100");
+//        for (int i = 0; i < N; i++) {
+//            System.out.printf("%4d", StdRandom.uniform(0, N - 1));
+//        }
+
+        System.out.println(toJadenSmith(null));
 
     }
 }
