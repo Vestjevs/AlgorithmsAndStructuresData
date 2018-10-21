@@ -4,11 +4,9 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class ErdosRenyi {
-
-
     public static int count(int n) {
         Random random = new Random();
-        QuickUnionByHeight uf = new QuickUnionByHeight(n);
+        WeightedQuickUnionUF uf = new WeightedQuickUnionUF(n);
         int p;
         int q;
         int c = 0;

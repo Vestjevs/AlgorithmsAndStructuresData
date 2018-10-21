@@ -14,7 +14,6 @@ public class RandomBag<T> implements Iterable<T> {
 
     }
 
-
     public void add(T element) {
         if (this.size == elements.length) resize(2 * elements.length);
         elements[size++] = element;
@@ -47,7 +46,7 @@ public class RandomBag<T> implements Iterable<T> {
         int i = 0;
         T[] tmpElement = elements;
 
-        ListIterator(){
+        ListIterator() {
             Collections.shuffle(Arrays.asList(tmpElement));
         }
 
