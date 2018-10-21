@@ -1,6 +1,8 @@
 package Chapter2Sort;
 
-import java.util.Arrays;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class Insertion {
 
@@ -16,7 +18,7 @@ public class Insertion {
 
     public static void sortOpt(Comparable[] a) {
         int exc = 0;
-        for (int i = a.length; i > 0; i--) {
+        for (int i = a.length - 1; i > 0; i--) {
             if (less(a[i], a[i - 1])) {
                 exch(a, i, i - 1);
                 exc++;
@@ -27,8 +29,8 @@ public class Insertion {
         for (int i = 2; i < a.length; i++) {
             Comparable v = a[i];
             int j = i;
-            while (less(v, a[j-1])){
-                a[j] = a[j-1];
+            while (less(v, a[j - 1])) {
+                a[j] = a[j - 1];
                 j--;
             }
             a[j] = v;
@@ -53,11 +55,19 @@ public class Insertion {
         return true;
     }
 
+    public static double time(Comparable[] a){
+        Stopwatch timer = new Stopwatch();
+        sort(a);
+        return timer.elapsedTime();
+    }
 
     public static void main(String[] args) {
-        String[] str = {"S", "O", "R", "T", "E", "X", "A", "M", "P", "L", "E"};
-        sort(str);
-        System.out.println(Arrays.toString(str));
+        Scanner sc = new Scanner(System.in);
+        Double[] arr;
+        Random random = new Random();
+        arr = IntStream.range(0, sc.nextInt()).mapToObj(i -> random.nextDouble()).toArray(Double[]::new);
+        System.out.printf("Time of sorting:  %.5f", time(arr));
+
     }
 
 }

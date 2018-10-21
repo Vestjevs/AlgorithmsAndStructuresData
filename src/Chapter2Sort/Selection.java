@@ -1,5 +1,9 @@
 package Chapter2Sort;
 
+import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.IntStream;
+
 public class Selection {
 
 
@@ -28,5 +32,19 @@ public class Selection {
             if (less(a[i], a[i - 1])) return false;
         }
         return true;
+    }
+    public static double time(Comparable[] a){
+        Stopwatch timer = new Stopwatch();
+        sort(a);
+        return timer.elapsedTime();
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Double[] arr;
+        Random random = new Random();
+        arr = IntStream.range(0, sc.nextInt()).mapToObj(i -> random.nextDouble()).toArray(Double[]::new);
+        System.out.printf("Time of sorting:  %.5f", time(arr));
+
     }
 }
