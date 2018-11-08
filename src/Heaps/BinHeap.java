@@ -1,4 +1,4 @@
-package HeapAndTrees;
+package Heaps;
 
 import java.util.*;
 
