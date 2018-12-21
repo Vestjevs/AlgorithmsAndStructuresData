@@ -2,27 +2,27 @@ package Heaps;
 
 import java.util.ArrayList;
 
-public class FibHeap<Key extends Comparable<Key>> {
+public class FibHeap {
 
     private Node root;
     private int size;
 
-    private class Node {
+    private static class Node {
         Node left, right, child, parent;
-        Key key;
+        int key;
         int degree;
 
-        Node(Key key) {
+        Node(int key) {
             this.key = key;
             left = right = parent = child = null;
             degree = 1;
         }
 
-        private String toString(Node x, String prefix) {
+        private static String toSString(Node x, String prefix) {
             if (x == null) {
                 return "";
             }
-            return String.format("%sKey : %s%s", prefix, x.key.toString(), x.child.key.toString());
+            return String.format("%sNode: %s%s", prefix, x.key, toSString(x.child, prefix + " "));
         }
     }
 
@@ -31,7 +31,7 @@ public class FibHeap<Key extends Comparable<Key>> {
         this.size = 0;
     }
 
-    public void add(Key key) {
+    public void add(int key) {
         Node newNode = new Node(key);
         if (root == null) {
             root = newNode;
@@ -43,13 +43,13 @@ public class FibHeap<Key extends Comparable<Key>> {
             root.left = newNode;
             newNode.right = root;
         }
-        if (newNode.key.compareTo(root.key) < 0) {
+        if (newNode.key < root.key) {
             root = newNode;
         }
         size++;
     }
 
-    public Key getMin() {
+    public int getMin() {
         return root.key;
     }
 
@@ -62,7 +62,7 @@ public class FibHeap<Key extends Comparable<Key>> {
         r.left = l;
     }
 
-    public void merge(FibHeap<Key> that) {
+    public void merge(FibHeap that) {
         if (that.size == 0) {
             return;
         }
@@ -75,7 +75,7 @@ public class FibHeap<Key extends Comparable<Key>> {
         }
     }
 
-    public Key deleteMin() {
+    public int deleteMin() {
         Node aux = root;
         if (root.child != null) {
             union(root, root.child);
@@ -103,7 +103,7 @@ public class FibHeap<Key extends Comparable<Key>> {
             } else {
                 Node conflict = arr.get(curr.degree - 1);
                 Node addTo, adding;
-                if (conflict.key.compareTo(curr.key) < 0) {
+                if (conflict.key < curr.key) { // conflict.key < curr.key
                     addTo = conflict;
                     adding = curr;
                 } else {
@@ -116,26 +116,27 @@ public class FibHeap<Key extends Comparable<Key>> {
                     addTo.degree++;
                 }
             }
-            if (root.key.compareTo(curr.key) > 0) {
+            if (root.key  > curr.key) {
                 root = curr;
             }
         }
 
     }
 
-    public String ToString() {
-        return root.toString(root, "");
+    public String ToSString() {
+        return Node.toSString(root, " ");
     }
 
     public static void main(String[] args) {
-        FibHeap<Integer> heap = new FibHeap<>();
+        FibHeap heap = new FibHeap();
 
         heap.add(10);
         heap.add(12);
         heap.add(15);
         heap.add(18);
+        heap.add(20);
         heap.deleteMin();
-//        System.out.println(heap.ToString());
+        System.out.println(heap.ToSString());
 
     }
 }

@@ -1,6 +1,7 @@
 package Chapter3Find;
 
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 public class RedBlackBST<Key extends Comparable<Key>, Value> {
 
@@ -22,13 +23,14 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
             this.color = color;
         }
 
-        private String toSString(Node x, String prefix){
 
-            if (x == null) {
-                return "";
-            }
-            return  String.format("%sKey : %s; %o%n%s%s ", prefix, x.key.toString(), x.degree, toSString(x.left, prefix + " "), toSString(x.right, prefix));
-        }
+//        private String toSString(Node x, String prefix){
+//
+//            if (x == null) {
+//                return "";
+//            }
+//            return  String.format("%sKey : %s; %o%n%s%s ", prefix, x.key.toString(), x.degree, toSString(x.left, prefix + " "), toSString(x.right, prefix));
+//        }
 
     }
 
@@ -76,49 +78,51 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
         //Search key, if searched, will change value;
         // if no - increase tree
         if (key == null) throw new IllegalArgumentException("Null key");
-        if(value == null) { delete(key); return; }
+        if (value == null) {
+            delete(key);
+            return;
+        }
         root = put(root, key, value);
         root.color = BLACK;
     }
 
-    private Node put(Node x, Key key, Value value) {
-        if (x == null)
+    private Node put(Node node, Key key, Value value) {
+        if (node == null)
             return new Node(key, value, 1, RED);
-        int cmp = key.compareTo(x.key);
-        if (cmp < 0) x.left = put(x.left, key, value);
-        else if (cmp > 0) x.right = put(x.right, key, value);
-        else x.value = value;
+        int cmp = key.compareTo(node.key);
+        if (cmp < 0) node.left = put(node.left, key, value);
+        else if (cmp > 0) node.right = put(node.right, key, value);
+        else node.value = value;
 
-        if (isRed(x.right) && !isRed(x.left)) x = rotateLeft(x);
-        if (isRed(x.left) && isRed(x.left.left)) x = rotateRight(x);
-        if (isRed(x.left) && isRed(x.right)) flipColors(x);
+        if (isRed(node.right) && !isRed(node.left)) node = rotateLeft(node);
+        if (isRed(node.left) && isRed(node.left.left)) node = rotateRight(node);
+        if (isRed(node.left) && isRed(node.right)) flipColors(node);
 
-        x.degree = size(x.right) + size(x.left) + 1;
-        return x;
+        node.degree = size(node.right) + size(node.left) + 1;
+        return node;
     }
 
     public void deleteMin() {
         if (root == null) throw new NoSuchElementException("BST underflow");
 
-        // if both children of root are black, set root to red
         if (!isRed(root.left) && !isRed(root.right))
             root.color = RED;
 
         root = deleteMin(root);
         if (root != null) root.color = BLACK;
-        // assert check();
+
     }
 
     // delete the key-value pair with the minimum key rooted at h
-    private Node deleteMin(Node h) {
-        if (h.left == null)
+    private Node deleteMin(Node node) {
+        if (node.left == null)
             return null;
 
-        if (!isRed(h.left) && !isRed(h.left.left))
-            h = moveRedLeft(h);
+        if (!isRed(node.left) && !isRed(node.left.left))
+            node = moveRedLeft(node);
 
-        h.left = deleteMin(h.left);
-        return balance(h);
+        node.left = deleteMin(node.left);
+        return balance(node);
     }
 
     public void deleteMax() {
@@ -157,49 +161,46 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
         if (size() != 0) root.color = BLACK;
     }
 
-    private Node delete(Node x, Key key) {
-        int cmp = key.compareTo(x.key);
+    private Node delete(Node node, Key key) {
+        int cmp = key.compareTo(node.key);
         if (cmp < 0) {
-            if(!isRed(x.left) && !isRed(x.left.left))
-                x = moveRedLeft(x);
-            x.left = delete(x.left, key);
-        }
-        else {
-            if(isRed(x.left))
-                x = rotateRight(x);
-            if(cmp == 0 && (x.right == null))
+            if (!isRed(node.left) && !isRed(node.left.left))
+                node = moveRedLeft(node);
+            node.left = delete(node.left, key);
+        } else {
+            if (isRed(node.left))
+                node = rotateRight(node);
+            if (cmp == 0 && (node.right == null))
                 return null;
-            if(!isRed(x.right) && !isRed(x.right.left))
-                x = moveRedRight(x);
-            if(cmp == 0){
-                Node h = min(x.right);
-                x.key = h.key;
-                x.value = h.value;
-                x.right = deleteMin(x.right);
-            }
-            else x.right = delete(x.right, key);
+            if (!isRed(node.right) && !isRed(node.right.left))
+                node = moveRedRight(node);
+            if (cmp == 0) {
+                Node h = min(node.right);
+                node.key = h.key;
+                node.value = h.value;
+                node.right = deleteMin(node.right);
+            } else node.right = delete(node.right, key);
         }
-        return balance(x);
+        return balance(node);
     }
 
-    private Node balance(Node h) {
-       // flipColors(h);
-        if (isRed(h.right)) h = rotateLeft(h);
-        if (isRed(h.left) && isRed(h.left.left)) h = rotateRight(h);
-        if (isRed(h.left) && isRed(h.right)) flipColors(h);
+    private Node balance(Node node) {
+        if (isRed(node.right)) node = rotateLeft(node);
+        if (isRed(node.left) && isRed(node.left.left)) node = rotateRight(node);
+        if (isRed(node.left) && isRed(node.right)) flipColors(node);
 
-        h.degree = size(h.left) + size(h.right) + 1;
-        return h;
+        node.degree = size(node.left) + size(node.right) + 1;
+        return node;
     }
 
-    private Node moveRedLeft(Node h) {
-        flipColors(h);
-        if (isRed(h.right.left)) {
-            h.right = rotateRight(h.right);
-            h = rotateLeft(h);
-            flipColors(h);
+    private Node moveRedLeft(Node node) {
+        flipColors(node);
+        if (isRed(node.right.left)) {
+            node.right = rotateRight(node.right);
+            node = rotateLeft(node);
+            flipColors(node);
         }
-        return h;
+        return node;
     }
 
     private Node moveRedRight(Node h) {
@@ -211,31 +212,42 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
         return h;
     }
 
-    private Node min(Node x){
-        if(x.left == null)
+    private Node min(Node x) {
+        if (x.left == null)
             return x;
         else return min(x.left);
     }
 
-    private Node max(Node x){
-        if(x.right == null)
+    private Node max(Node x) {
+        if (x.right == null)
             return x;
         else return max(x.right);
     }
 
-    @Override
-    public String toString() {
-        return root.toSString(root, " ");
+    public String toSString() {
+        return toSString(root, " ");
     }
 
+    private String toSString(Node node, String s) {
+        if (node == null) {
+            return "";
+        } else {
+            String indent = s + "\t";
+            return String.format("%sNode -> %s :%o\n%s%s", s, node.key.toString(), node.degree, toSString(node.left, indent), toSString(node.right, indent));
+
+        }
+    }
+
+
     public static void main(String[] args) {
-        RedBlackBST<String, Integer> tree = new RedBlackBST<>();
+        RedBlackBST<Integer, Integer> tree = new RedBlackBST<>();
+        Random pr = new Random();
+        for (int i = 0; i < 15; i++) {
+            tree.put(Math.abs(pr.nextInt() % 100), i);
+        }
 
-        tree.put("a", 0);
-        tree.put("e", 1);
-        tree.put("h", 2);
+        System.out.println(tree.toSString());
 
-        System.out.println(tree.toString());
 
 
     }

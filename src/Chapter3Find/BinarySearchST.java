@@ -3,6 +3,8 @@ package Chapter3Find;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class BinarySearchST<Key extends Comparable<Key>, Value> implements ST<Key, Value> {
 
@@ -31,14 +33,18 @@ public class BinarySearchST<Key extends Comparable<Key>, Value> implements ST<Ke
         if (i < size && keys[i].compareTo(key) == 0) {
             values[i] = value;
             return;
+        } else {
+            if (this.size == this.keys.length) {
+                resize(2 * this.keys.length);
+            }
+            for (int j = size; j > i; j--) {
+                keys[j] = keys[j - 1];
+                values[j] = values[j - 1];
+            }
+            keys[i] = key;
+            values[i] = value;
+            size++;
         }
-        for (int j = size; j > i; j--) {
-            keys[j] = keys[j - 1];
-            values[j] = values[j - 1];
-        }
-        keys[i] = key;
-        values[i] = value;
-        size++;
     }
 
     @Override
@@ -63,6 +69,10 @@ public class BinarySearchST<Key extends Comparable<Key>, Value> implements ST<Ke
             this.size--;
             this.keys[this.size] = null;
             this.values[this.size] = null;
+        }
+
+        if (size > 0 && this.size == this.keys.length / 4) {
+            resize(this.keys.length / 2);
         }
     }
 
@@ -160,4 +170,42 @@ public class BinarySearchST<Key extends Comparable<Key>, Value> implements ST<Ke
      *   }
      *   return lo;
      * }*/
+
+    private void resize(int k) {
+        Key[] newKeys = (Key[]) new Comparable[k];
+        Value[] newValues = (Value[]) new Object[k];
+        IntStream.range(0, this.size).forEach(i -> {
+            newKeys[i] = keys[i];
+            newValues[i] = values[i];
+        });
+        keys = newKeys;
+        values = newValues;
+    }
+
+    public static void main(String[] args) {
+        BinarySearchST<String, Double> st = new BinarySearchST<>();
+        st.put("A+", 4.33);
+        st.put("A", 4.0);
+        st.put("A-", 3.67);
+        st.put("B+", 3.33);
+        st.put("B", 3.0);
+        st.put("B-", 2.67);
+        st.put("C+", 2.0);
+        st.put("C", 1.67);
+        st.put("C-", 1.33);
+        st.put("D", 1.0);
+        st.put("F", .0);
+
+        int sum = 0;
+        int count = 0;
+        Scanner scanner = new Scanner(System.in);
+        String str = scanner.nextLine();
+        while (!str.equals("X")) {
+            count++;
+//            System.out.println(st.get(str));
+            sum += st.get(str);
+            str = scanner.nextLine();
+        }
+        System.out.println(sum / count);
+    }
 }
