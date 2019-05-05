@@ -1,8 +1,9 @@
 package Chapter1;
 
 
-
 import Chapter1.Interfaces.StaticSETofInts;
+
+import java.util.Arrays;
 
 public class BinarySearch implements StaticSETofInts {
     int[] array;
@@ -24,6 +25,36 @@ public class BinarySearch implements StaticSETofInts {
         return -1;
     }
 
+    public static int[] merge_sort(int[] array) {
+        if (array.length < 2) {
+            return array;
+        }
+        int[] result = new int[array.length];
+        int mid = array.length / 2;
+        int[] left = merge_sort(Arrays.copyOfRange(array, 0, mid));
+        int[] right = merge_sort(Arrays.copyOfRange(array, mid, array.length));
+        int k = 0;
+        int i = 0;
+        int j = 0;
+        while (i < left.length && j < right.length) {
+            if (left[i] < right[j]) {
+                result[k++] = left[i++];
+            } else {
+                result[k++] = right[j++];
+            }
+        }
+
+        while (i != left.length ) {
+            if (i < left.length) {
+                result[k++] = left[i++];
+            }
+        }
+        while (j != right.length )
+            if (j < right.length) {
+                result[k++] = right[j++];
+            }
+        return result;
+    }
 
     public static int rank(int key, int[] a) {
         return rank(key, a, 0, a.length - 1);
@@ -37,36 +68,16 @@ public class BinarySearch implements StaticSETofInts {
         else if (key > a[mid]) return rank(key, a, mid + 1, hi);
         else return mid;
     }
+
     @Override
     public boolean contains(int key) {
         return rank(array, key) != -1;
     }
 
     public static void main(String[] args) {
-        //        int[] array = new int[1000];
-//        int[] array2;
-//        int[][] a = new int[1000][1000];
-//        int[][] b = new int[1000][1000];
-//        int[][] c = new int[1000][1000];
-//        int temp = 0;
-
-//        /**reverse array */
-//        for (int i = 0; i < array.length / 2; i++) {
-//            tmp = array[i];
-//            array[i] = array[array.length - i - 1];
-//            array[array.length - i - 1] = temp;
-//        }
-//        /**Умножение матрицы на матрицу (квадратных) */
-//        for (int i = 0; i < array.length; i++) {
-//            for (int j = 0; j < array.length; j++)
-//            /**Вычисление скалярного произведения строки i и столбца j*/ {
-//                for (int k = 0; k < array.length; k++) {
-//                    c[i][j] += a[i][k] * b[k][j];
-//                }
-//            }
-//        }
-
-
+        int[] array = {1, 54, 84, 83, 4, 15, 12, 19, 32, 17};
+        System.out.println(Arrays.toString(array));
+        System.out.println(Arrays.toString(merge_sort(array)));
     }
 
 

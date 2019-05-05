@@ -74,7 +74,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
         h.right.color = !h.right.color;
     }
 
-    public void put(Key key, Value value) {
+    public void insert(Key key, Value value) {
         //Search key, if searched, will change value;
         // if no - increase tree
         if (key == null) throw new IllegalArgumentException("Null key");
@@ -82,16 +82,16 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
             delete(key);
             return;
         }
-        root = put(root, key, value);
+        root = insert(root, key, value);
         root.color = BLACK;
     }
 
-    private Node put(Node node, Key key, Value value) {
+    private Node insert(Node node, Key key, Value value) {
         if (node == null)
             return new Node(key, value, 1, RED);
         int cmp = key.compareTo(node.key);
-        if (cmp < 0) node.left = put(node.left, key, value);
-        else if (cmp > 0) node.right = put(node.right, key, value);
+        if (cmp < 0) node.left = insert(node.left, key, value);
+        else if (cmp > 0) node.right = insert(node.right, key, value);
         else node.value = value;
 
         if (isRed(node.right) && !isRed(node.left)) node = rotateLeft(node);
@@ -243,7 +243,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
         RedBlackBST<Integer, Integer> tree = new RedBlackBST<>();
         Random pr = new Random();
         for (int i = 0; i < 15; i++) {
-            tree.put(Math.abs(pr.nextInt() % 100), i);
+            tree.insert(Math.abs(pr.nextInt() % 100), i);
         }
 
         System.out.println(tree.toSString());

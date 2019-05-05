@@ -1,142 +1,188 @@
 package Heaps;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class FibHeap {
+public class FibHeap<T extends Comparable<T>> {
 
-    private Node root;
+    private Node min;
     private int size;
 
-    private static class Node {
+    private class Node {
         Node left, right, child, parent;
-        int key;
+        T key;
         int degree;
+        boolean marked = false;
 
-        Node(int key) {
+        Node(T key) {
             this.key = key;
-            left = right = parent = child = null;
-            degree = 1;
+            right = this;
+            left = this;
         }
 
-        private static String toSString(Node x, String prefix) {
-            if (x == null) {
+        public void addChild(Node node) {
+            node.parent = this;
+            node.removeSib();
+            if (child == null) {
+                child = node;
+                degree++;
+            } else {
+                child = child.addSib(node);
+                degree++;
+            }
+        }
+
+        public void removeSib() {
+            if (right == null) {
+                return;
+            }
+            Node R = this.right;
+            Node L = this.left;
+            right.left = left;
+            left.right = right;
+            right = this;
+            left = this;
+        }
+
+        public Node addSib(Node node) {
+            if (key.compareTo(node.key) <= 0) {
+                addRightSib(node);
+                return this;
+            } else {
+                node.addListAsSib(this);
+                return node;
+            }
+        }
+
+        private void addRightSib(Node node) {
+            right.left = node;
+            node.left = this;
+            node.right = right;
+            right = node;
+        }
+
+        private void addListAsSib(Node node) {
+            Node ne = node.left;
+            Node cb = this;
+            Node ce = this.right;
+            ne.right = ce;
+            ce.left = ne;
+            cb.right = node;
+            node.left = cb;
+        }
+
+        public int addChildAsSib(Node node) {
+            if (node.child == null) {
+                return 0;
+            }
+            addListAsSib(node.child);
+            return node.degree;
+        }
+
+        public Node addTo(Node p) {
+            if (p == null) {
+                parent = null;
+            } else {
+                p.addChild(this);
+            }
+            return this;
+        }
+
+        public String toSString(Node node, String prefix) {
+            return toSString(null, node, prefix);
+        }
+
+        private String toSString(Node start, Node node, String prefix) {
+            if (node == null || node == start) {
                 return "";
             }
-            return String.format("%sNode: %s%s", prefix, x.key, toSString(x.child, prefix + " "));
+            if (start == null) {
+                start = node;
+            }
+
+            return String.format("%sNode %s; %o\n%s%s", prefix, node.key, node.degree, toSString(null, node.child, prefix + " "), toSString(start, node.right, prefix));
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Node %s; %o", key, degree);
         }
     }
 
     public FibHeap() {
-        this.root = null;
+        this.min = null;
         this.size = 0;
     }
 
-    public void add(int key) {
-        Node newNode = new Node(key);
-        if (root == null) {
-            root = newNode;
-            root.left = root.right = newNode;
-        } else {
-            Node auxNode = root.left;
-            auxNode.right = newNode;
-            newNode.left = auxNode;
-            root.left = newNode;
-            newNode.right = root;
+    public void insert(T key) {
+        if (min == null) {
+            min = new Node(key);
+            size = 1;
+            return;
         }
-        if (newNode.key < root.key) {
-            root = newNode;
-        }
+        min = min.addSib(new Node(key));
         size++;
     }
 
-    public int getMin() {
-        return root.key;
+    public T getMin() {
+        return min.key;
     }
 
-    private void union(Node first, Node second) {
-        Node l = first.left;
-        Node r = second.right;
-        second.right = first;
-        first.left = second;
-        l.right = r;
-        r.left = l;
-    }
 
-    public void merge(FibHeap that) {
-        if (that.size == 0) {
+    public void deleteMin() {
+        if (min == null) {
             return;
         }
-        if (size == 0) {
-            root = that.root;
-            size = that.size;
+        Node m = min;
+        size--;
+        if (min.right != min) {
+            min = min.right;
+            m.removeSib();
+            min.addChildAsSib(m);
+            consolidate();
         } else {
-            union(root, that.root);
-            size += that.size;
+            min = min.child;
         }
     }
 
-    public int deleteMin() {
-        Node aux = root;
-        if (root.child != null) {
-            union(root, root.child);
-        }
-        Node l = root.left;
-        // удаляем root из списка
-        Node r = root.right;
-        l.right = r;
-        r.left = l;
-        if (aux.right == aux) {
-            root = root.right;
-        }
-        consolidate();
-        size--;
-        return aux.key;
-    }
 
     private void consolidate() {
-        ArrayList<Node> arr = new ArrayList<>();
-        arr.add(root.degree - 1, root);
-        Node curr = root.right;
-        while (true) {
-            if (arr.get(curr.degree - 1) == null) {
-                arr.add(curr.degree - 1, curr);
+        ArrayList<Node> list = IntStream.range(0, size).<Node>mapToObj(i -> null).collect(Collectors.toCollection(() -> new ArrayList<>(size)));
+        Node current = min;
+        while (list.get(current.degree) != current) {
+            if (list.get(current.degree) == null) {
+                list.set(current.degree, current);
+                current = current.right;
             } else {
-                Node conflict = arr.get(curr.degree - 1);
-                Node addTo, adding;
-                if (conflict.key < curr.key) { // conflict.key < curr.key
-                    addTo = conflict;
-                    adding = curr;
+                Node conflict = list.get(current.degree);
+                list.set(conflict.degree, null);
+                if (conflict.key.compareTo(current.key) <= 0) {
+                    conflict.addChild(current);
+                    current = conflict;
                 } else {
-                    adding = conflict;
-                    addTo = curr;
-                }
-                if (addTo.child != null) {
-                    union(addTo.child, adding);
-                    adding.parent = addTo;
-                    addTo.degree++;
+                    current.addChild(conflict);
                 }
             }
-            if (root.key  > curr.key) {
-                root = curr;
+            if(current.key.compareTo(min.key) <= 0){
+                min = current;
             }
         }
-
     }
 
-    public String ToSString() {
-        return Node.toSString(root, " ");
+    public String toSString() {
+        return String.format("Tree %o\n%s", size, min.toSString(min, " "));
     }
 
     public static void main(String[] args) {
-        FibHeap heap = new FibHeap();
+        FibHeap<Integer> heap = new FibHeap<>();
+        Random pr = new Random();
 
-        heap.add(10);
-        heap.add(12);
-        heap.add(15);
-        heap.add(18);
-        heap.add(20);
+        IntStream.range(0, 15).mapToObj(i -> Math.abs(pr.nextInt() % 15)).forEach(heap::insert);
         heap.deleteMin();
-        System.out.println(heap.ToSString());
+        System.out.println(heap.toSString());
+
 
     }
 }

@@ -8,6 +8,8 @@ public class TransactionImpl implements Comparable<TransactionImpl> {
     private final String who;      // customer
     private final DateFirstRealize when;     // date
     private final double amount;   // amount
+    private int hash = 31;
+
 
     public TransactionImpl(String who, DateFirstRealize when, double amount) throws IllegalAccessException {
         if (Double.isNaN(amount) || Double.isInfinite(amount))
@@ -17,7 +19,7 @@ public class TransactionImpl implements Comparable<TransactionImpl> {
         this.amount = amount;
     }
 
-    public TransactionImpl(String transaction){
+    public TransactionImpl(String transaction) {
         String[] str1 = transaction.split(" ");
         this.who = str1[0];
         this.when = new DateFirstRealize(str1[1]);
@@ -41,6 +43,17 @@ public class TransactionImpl implements Comparable<TransactionImpl> {
         return String.format("-%10s %10s %8.2f", who, when, amount);
     }
 
+
+    @Override
+    public int hashCode() {
+        if (hash == 31) {
+            hash = 31 * hash + who.hashCode();
+            hash = 31 * hash + when.hashCode();
+            hash = 31 * hash + ((Double) amount).hashCode();
+        }
+        return hash;
+    }
+
     @Override
     public int compareTo(TransactionImpl o) {
         return 0;
@@ -56,6 +69,11 @@ public class TransactionImpl implements Comparable<TransactionImpl> {
 
         if (this.amount != that.amount) return false;
         if (!this.when.equals(that.when)) return false;
-        return this.who == that.who;
+        return this.who.equals(that.who);
     }
+
+    public static void main(String[] args) {
+
+    }
+
 }

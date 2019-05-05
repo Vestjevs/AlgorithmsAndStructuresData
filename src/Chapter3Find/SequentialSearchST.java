@@ -2,7 +2,6 @@ package Chapter3Find;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 public class SequentialSearchST<Key, Value> implements ST<Key, Value> {
 
@@ -147,16 +146,7 @@ public class SequentialSearchST<Key, Value> implements ST<Key, Value> {
     }
 
     public static void main(String[] args) {
-        SequentialSearchST<String, Integer> st = new SequentialSearchST<>();
-        Scanner in = new Scanner(System.in);
-        int i = 0;
-        while (true) {
-            String str = in.nextLine();
-            st.put(str, i++);
-        }
-//        for (String s :
-//                st.keys()) {
-//
+
 //        }
     }
 

@@ -49,7 +49,7 @@ public interface ST<Key, Value> extends Iterable<Key> {
 //    Iterable<Key> keys();
 
     /**
-     * Return count keys which less than current key
+     * Return k keys which less than current key
      */
     int rank(Key key);
 

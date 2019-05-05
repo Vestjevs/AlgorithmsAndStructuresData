@@ -31,6 +31,14 @@ public class DateFirstRealize implements IDate {
         return value / 512;
     }
 
+    public int hashcode() {
+        int hash1 = 11;
+        int hash2 = hash1 * Integer.valueOf(month()).hashCode() + 31;
+        hash1 = hash2 + Integer.valueOf(year()).hashCode() + 31;
+        hash2 = hash1 + Integer.valueOf(day()).hashCode() + 31;
+        return hash2;
+    }
+
     public String toString() {
         return month() + "/" + day() + "/" + year();
     }
@@ -53,4 +61,9 @@ public class DateFirstRealize implements IDate {
     }
 
 
+    public static void main(String[] args) {
+        DateFirstRealize dateFirstRealize = new DateFirstRealize(8, 31, 1998);
+        System.out.println(dateFirstRealize.hashcode());
+
+    }
 }
