@@ -1,20 +1,22 @@
 package Chapter3Find;
 
-import java.util.Random;
+import java.io.IOException;
+import java.util.Scanner;
 
-public class AVLTree {
+public class AVLTree<Key extends Comparable<Key>, Value> {
 
     private Node root;
 
-    class Node {
-        private Node left, right;
-        private int key;
-        private int balance;
-        public int degree;
+    private class Node {
+        Value value;
+        Key key;
+        Node left, right;
+        int degree;
 
-        public Node(int key) {
+        public Node(Key key, Value value, int degree) {
             this.key = key;
-            left = right = null;
+            this.value = value;
+            this.degree = degree;
         }
 
         public String toSString(Node node, String prefix) {
@@ -22,295 +24,178 @@ public class AVLTree {
                 return "";
             } else {
                 String indent = prefix + '\t';
-                return String.format("%sNode ->%o; \n%s%s", prefix, node.key, toSString(node.left, indent), toSString(node.right, indent));
+                return String.format("%sNode -> %s; \n%s%s", prefix, node.key, toSString(node.left, indent), toSString(node.right, indent));
             }
         }
     }
 
-    public void insert(int key) {
-        root = insert(root, key, true);
+    public AVLTree() {
     }
 
-    private Node insert(Node node, int key, boolean isHigh) {
-        if (node == null) {
-            node = new Node(key);
-            isHigh = true;
-            return node;
-        }
-//        if (key == node.key) {
-//            return;
-//        }
-        Node x1, x2;
-
-        if (key < node.key) {
-            node.left = insert(node.left, key, isHigh);
-            if (isHigh) {
-                switch (node.balance) {
-                    case 1: {
-                        node.balance = 0;
-                        isHigh = false;
-                        break;
-                    }
-                    case 0: {
-                        node.balance = -1;
-                        break;
-                    }
-                    case -1: {
-                        x1 = node.left;
-                        if (x1.balance == -1) {
-                            node.left = x1.right;
-                            x1.right = node;
-                            node.balance = 0;
-                            node = x1;
-                        } else {
-                            x2 = x1.right;
-                            x1.right = x2.left;
-                            x2.left = x1;
-                            node.left = x2.right;
-                            x2.right = node;
-
-                            if (x2.balance == -1) {
-                                node.balance = 1;
-                            } else {
-                                node.balance = 0;
-                            }
-
-                            if (x2.balance == 1) {
-                                x1.balance = -1;
-                            } else {
-                                x1.balance = 0;
-                            }
-                            node = x2;
-                        }
-                        node.balance = 0;
-                        isHigh = false;
-                        break;
-                    }
-                }
-            }
-
-
-        }
-        if (key > node.key) {
-            node.right = insert(node.right, key, isHigh);
-
-            if (isHigh) {
-                switch (node.balance) {
-                    case -1: {
-                        node.balance = 0;
-                        isHigh = false;
-                        break;
-                    }
-                    case 0: {
-                        node.balance = 1;
-                        break;
-                    }
-                    case 1: {
-                        x1 = node.right;
-                        if (x1.balance == 1) {
-                            node.right = x1.left;
-                            x1.left = node;
-                            node.balance = 0;
-                            node = x1;
-                        } else {
-                            x2 = x1.left;
-                            x1.left = x2.right;
-                            x2.right = x1;
-                            node.right = x2.left;
-                            x2.left = node;
-
-                            if (x2.balance == 1) {
-                                node.balance = -1;
-                            } else if (x2.balance == -1) {
-                                x1.balance = 1;
-                            } else {
-                                node.balance = 0;
-                            }
-                            node = x2;
-                        }
-
-                        node.balance = 0;
-                        isHigh = false;
-                        break;
-                    }
-                }
-            }
-        }
-        return node;
+    public void insert(Key key, Value value) {
+        root = insert(root, key, value);
     }
 
-
-    private void balanceLeft(Node node, boolean isLower) {
-        switch (node.balance) {
-            case -1: {
-                node.balance = 0;
-                break;
-            }
-            case 0: {
-                node.balance = 1;
-                isLower = false;
-                break;
-            }
-            case 1: {
-                Node x1 = node.right;
-                int bal1 = x1.balance;
-
-                if (bal1 >= 0) {
-                    node.right = x1.left;
-                    x1.left = node;
-
-                    if (bal1 == 0) {
-                        node.balance = 1;
-                        x1.balance = -1;
-                        isLower = false;
-                    } else {
-                        node.balance = 0;
-                        x1.balance = -1;
-                        isLower = false;
-                    }
-                    node = x1;
-                } else {
-                    Node x2 = x1.left;
-                    int bal2 = x2.balance;
-
-                    x1.left = x2.right;
-                    x2.right = x1;
-                    node.right = x2.left;
-                    x2.left = node;
-
-                    if (bal2 == 1) {
-                        node.balance = -1;
-                    } else if (bal2 == -1) {
-                        x1.balance = 1;
-                    } else {
-                        x1.balance = 0;
-                    }
-
-                    node = x2;
-                    x2.balance = 0;
-                }
-                break;
-            }
-
-        }
-    }
-
-    private void balanceRight(Node node, boolean isLower) {
-        switch (node.balance) {
-            case 1: {
-                node.balance = 0;
-                break;
-            }
-            case 0: {
-                node.balance = -1;
-                isLower = false;
-                break;
-            }
-            case -1: {
-                Node x1 = node.left;
-                int bal1 = x1.balance;
-
-                if (bal1 <= 0) {
-                    node.left = x1.right;
-                    x1.right = node;
-
-                    if (bal1 == 0) {
-                        node.balance = -1;
-                        x1.balance = 1;
-                        isLower = false;
-                    } else {
-                        node.balance = 0;
-                        x1.balance = 0;
-                    }
-                    node = x1;
-                } else {
-                    Node x2 = x1.right;
-                    int bal2 = x2.balance;
-
-                    x1.right = x2.left;
-                    x2.left = x1;
-                    node.left = x2.right;
-                    x2.right = node;
-
-                    if (bal2 == -1) {
-                        node.balance = 1;
-                    } else if (bal2 == 1) {
-                        x1.balance = -1;
-                    } else {
-                        x1.balance = 0;
-                    }
-
-                    node = x2;
-                    x2.balance = 0;
-                }
-                break;
-            }
-        }
-    }
-
-    private void Del(Node node, boolean isLower, Node delNode) {
-        if (node.right != null) {
-            Del(node.right, isLower, delNode);
-            if (isLower) {
-                balanceRight(node, isLower);
-            }
+    private Node insert(Node h, Key key, Value value) {
+        if (h == null) {
+            return new Node(key, value, 1);
         } else {
-            int key = node.key;
-            node.key = delNode.key;
-            delNode.key = key;
-            delNode = node;
-            node = node.left;
-            isLower = true;
-        }
-    }
-
-    private void delete(Node node, int key, boolean isLower) {
-        if (node == null) {
-            System.out.println("Insert key, dumb");
-            return;
-        }
-        if (key < node.key) {
-            delete(node.left, key, isLower);
-            if (isLower) {
-                balanceLeft(node, isLower);
-            }
-        } else if (key > node.key) {
-            delete(node.right, key, isLower);
-            if (isLower) {
-                balanceRight(node, isLower);
-            }
-        } else {
-            Node nodeToDel = node;
-            if (nodeToDel.right == null) {
-                node = nodeToDel.left;
-                isLower = true;
-            } else if (nodeToDel.left == null) {
-                node = nodeToDel.right;
-                isLower = true;
+            int cmp = key.compareTo(h.key);
+            if (cmp < 0) {
+                h.left = insert(h.left, key, value);
             } else {
-                Del(nodeToDel.left, isLower, nodeToDel);
-
-                if (isLower) {
-                    balanceLeft(node, isLower);
-                }
-                nodeToDel = null;
+                h.right = insert(h.right, key, value);
             }
+
+        }
+        h = this.balance(h);
+
+        h.degree = size(h.left) + size(h.right) + 1;
+        return h;
+    }
+
+    private Node balance(Node h) {
+        int b = nodeHeight(h.left) - nodeHeight(h.right);
+        if (b >= 2) {
+            if (this.nodeHeight(h.left.left) > this.nodeHeight(h.left.right) && this.nodeHeight(h.left.right) > 0) {
+                h = this.bigRotateRight(h);
+            } else {
+                h = this.rotateRight(h);
+            }
+        } else if (b <= -2) {
+            if (this.nodeHeight(h.right.right) > this.nodeHeight(h.right.left) && this.nodeHeight(h.right.left) > 0) {
+                h = this.bigRotateLeft(h);
+            } else {
+                h = this.rotateLeft(h);
+            }
+        }
+        return h;
+
+    }
+
+    private Node bigRotateRight(Node h) {
+        h.right = this.rotateLeft(h.right);
+        h = this.rotateRight(h);
+        return h;
+    }
+
+    private Node bigRotateLeft(Node h) {
+        h.left = this.rotateRight(h.right);
+        h = this.rotateLeft(h);
+        return h;
+    }
+
+    private int size(Node h) {
+        return (h == null) ? 0 : h.degree;
+    }
+
+    public int size() {
+        return size(this.root);
+    }
+
+    public void delete(Key key) {
+        if (key == null) {
+            System.out.println("Key is null");
+        } else
+            root = delete(root, key);
+
+    }
+
+    private Node delete(Node h, Key key) {
+        if (h == null) {
+            return null;
+        }
+        int cmp = key.compareTo(h.key);
+        if (cmp < 0) {
+            h.left = delete(h.left, key);
+        } else if (cmp > 0) {
+            h.right = delete(h.right, key);
+        } else {
+            if (h.right == null) return h.left;
+            if (h.left == null) return h.right;
+            Node t = h;
+            h = max(t.left);
+            h.left = deleteMax(t.left);
+            h.right = t.right;
+            h = this.balance(h);
 
 
         }
+        h.degree = size(h.left) + size(h.right) + 1;
+        return h;
+
     }
+
+    private int nodeHeight(Node h) {
+        if (h == null) {
+            return -1;
+        }
+        int lefth = nodeHeight(h.left);
+        int righth = nodeHeight(h.right);
+
+        if (lefth > righth) {
+            return lefth + 1;
+        } else {
+            return righth + 1;
+        }
+
+
+    }
+
+    private Node rotateLeft(Node h) {
+        Node x = h.right;
+        h.right = x.left;
+        x.left = h;
+        x.degree = h.degree;
+        h.degree = 1 + size(h.left) + size(h.right);
+        return x;
+    }
+
+    private Node rotateRight(Node h) {
+        Node x = h.left;
+        h.left = x.right;
+        x.right = h;
+        x.degree = h.degree;
+        h.degree = 1 + size(h.left) + size(h.right);
+        return x;
+    }
+
+    private Node deleteMax(Node h) {
+        if (h.right == null) return h.left;
+        h.right = deleteMax(h.right);
+        h.degree = size(h.left) + size(h.right) + 1;
+        return h;
+    }
+
+    private Node max(Node h) {
+        if (h.right == null) return h;
+        else return max(h.right);
+    }
+
 
     public String toSString() {
         return String.format("%s", root.toSString(root, " "));
     }
 
-    public static void main(String[] args) {
-        AVLTree tree = new AVLTree();
-        Random pr = new Random();
 
-        for (int i = 0; i < 8; i++) {
-            tree.insert(Math.abs(pr.nextInt() % 5));
+    public static void main(String[] args) {
+        AVLTree<Integer, Integer> tree = new AVLTree<>();
+        Scanner sc = new Scanner(System.in);
+        int i = 0;
+        while (i != 7) {
+            tree.insert(Integer.parseInt(sc.next()), i);
+            i++;
+            System.out.println(tree.toSString());
+
         }
-//        System.out.println(tree.toSString());
+
+        while (i > 0) {
+            tree.delete(sc.nextInt());
+            System.out.println(tree.toSString());
+            i--;
+        }
+
     }
+
+
 }
